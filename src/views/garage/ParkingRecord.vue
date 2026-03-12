@@ -11,7 +11,7 @@
               @clear="query"
             >
               <template #append>
-                <el-button type="info" @click="query" style="color:black">查询</el-button>
+                <el-button type="info" @click="query" style="color: black">查询</el-button>
               </template>
             </el-input>
           </el-col>
@@ -20,7 +20,7 @@
               v-model="queryParams.recordStatus"
               placeholder="在场状态"
               clearable
-              style="width:100%"
+              style="width: 100%"
               @change="query"
             >
               <el-option
@@ -39,9 +39,17 @@
           </el-col>
         </el-row>
       </el-header>
-      <el-divider style="margin:0"></el-divider>
+
+      <el-divider style="margin: 0" />
+
       <el-main>
-        <el-table :data="recordList" style="width:100%;color:black;" stripe>
+        <el-alert
+          title="出库结算时系统会自动计算费用，并需选择支付方式完成支付后出库。"
+          type="info"
+          :closable="false"
+          style="margin-bottom: 12px"
+        />
+        <el-table :data="recordList" style="width: 100%; color: black" stripe>
           <el-table-column align="center" type="index" :index="indexMethod" label="序号" width="60" />
           <el-table-column align="center" prop="plateNo" label="车牌号" width="130" />
           <el-table-column align="center" prop="spaceNo" label="车位编号" width="120" />
@@ -69,7 +77,8 @@
             </template>
           </el-table-column>
         </el-table>
-        <div style="margin-top:15px">
+
+        <div style="margin-top: 15px">
           <el-pagination
             :page-size="page.pageSize"
             background
@@ -90,40 +99,53 @@
       draggable
       :before-close="closeInDialog"
     >
-      <el-divider border-style="double" style="margin:0;" />
+      <el-divider border-style="double" style="margin: 0" />
       <el-form
         label-position="right"
         label-width="auto"
-        style="max-width:420px;margin:20px auto"
-        class="demo-form-inline"
+        style="max-width: 420px; margin: 20px auto"
         ref="inForm"
         :model="inDialog.form"
         :rules="inRules"
       >
-        <el-form-item label="车牌号" prop="plateNo">
-          <el-input v-model="inDialog.form.plateNo" />
+        <el-form-item label="车辆" prop="vehicleId">
+          <el-select v-model="inDialog.form.vehicleId" filterable placeholder="请选择车辆" style="width: 360px">
+            <el-option
+              v-for="item in vehicleOptions"
+              :key="item.id"
+              :label="`${item.plateNo} / ${item.ownerName || '-'}`"
+              :value="item.id"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="车位编号" prop="spaceNo">
-          <el-input v-model="inDialog.form.spaceNo" />
+          <el-select v-model="inDialog.form.spaceNo" filterable placeholder="请选择车位" style="width: 360px">
+            <el-option
+              v-for="item in spaceOptions"
+              :key="item.id"
+              :label="`${item.spaceNo} (${item.areaName || '-'}-${item.floorNo || '-'})`"
+              :value="item.spaceNo"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="入场时间" prop="inTime">
           <el-date-picker
-            style="width:360px"
+            style="width: 360px"
             v-model="inDialog.form.inTime"
             type="datetime"
             format="YYYY/MM/DD HH:mm:ss"
             value-format="YYYY-MM-DD HH:mm:ss"
             placeholder="请选择入场时间"
-          ></el-date-picker>
+          />
         </el-form-item>
         <el-form-item label="备注">
-          <el-input v-model="inDialog.form.remark" type="textarea" :rows="3" />
+          <el-input v-model="inDialog.form.remark" type="textarea" :rows="3" maxlength="100" show-word-limit />
         </el-form-item>
       </el-form>
-      <el-divider border-style="double" style="margin:0;" />
+      <el-divider border-style="double" style="margin: 0" />
       <template #footer>
-        <span class="dialog-footer" style="padding-top:0px">
-          <el-button type="primary" @click="saveIn('inForm')">保存</el-button>
+        <span class="dialog-footer" style="padding-top: 0px">
+          <el-button type="primary" :loading="inDialog.submitting" @click="saveIn('inForm')">保存</el-button>
           <el-button @click="closeInDialog">取消</el-button>
         </span>
       </template>
@@ -137,12 +159,11 @@
       draggable
       :before-close="closeOutDialog"
     >
-      <el-divider border-style="double" style="margin:0;" />
+      <el-divider border-style="double" style="margin: 0" />
       <el-form
         label-position="right"
         label-width="auto"
-        style="max-width:420px;margin:20px auto"
-        class="demo-form-inline"
+        style="max-width: 420px; margin: 20px auto"
         ref="outForm"
         :model="outDialog.form"
         :rules="outRules"
@@ -153,23 +174,30 @@
         <el-form-item label="车位编号">
           <el-input v-model="outDialog.form.spaceNo" readonly />
         </el-form-item>
+        <el-form-item label="入场时间">
+          <el-input v-model="outDialog.form.inTime" readonly />
+        </el-form-item>
         <el-form-item label="出场时间" prop="outTime">
           <el-date-picker
-            style="width:360px"
+            style="width: 360px"
             v-model="outDialog.form.outTime"
             type="datetime"
             format="YYYY/MM/DD HH:mm:ss"
             value-format="YYYY-MM-DD HH:mm:ss"
             placeholder="请选择出场时间"
-          ></el-date-picker>
+            @change="onOutTimeChange"
+          />
+        </el-form-item>
+        <el-form-item label="停车时长(分钟)">
+          <el-input v-model="outDialog.form.parkingMinutes" readonly />
         </el-form-item>
         <el-form-item label="费用(元)" prop="totalFee">
-          <el-input v-model="outDialog.form.totalFee" />
+          <el-input v-model="outDialog.form.totalFee" readonly />
         </el-form-item>
-        <el-form-item label="支付状态" prop="payStatus">
-          <el-select v-model="outDialog.form.payStatus" style="width:360px" placeholder="请选择支付状态">
+        <el-form-item label="支付方式" prop="payMethod">
+          <el-select v-model="outDialog.form.payMethod" style="width: 360px" placeholder="请选择支付方式">
             <el-option
-              v-for="item in payStatusOptions"
+              v-for="item in payMethodOptions"
               :key="item.value"
               :label="item.label"
               :value="item.value"
@@ -177,10 +205,10 @@
           </el-select>
         </el-form-item>
       </el-form>
-      <el-divider border-style="double" style="margin:0;" />
+      <el-divider border-style="double" style="margin: 0" />
       <template #footer>
-        <span class="dialog-footer" style="padding-top:0px">
-          <el-button type="primary" @click="saveOut('outForm')">保存</el-button>
+        <span class="dialog-footer" style="padding-top: 0px">
+          <el-button type="primary" :loading="outDialog.submitting" @click="saveOut('outForm')">保存</el-button>
           <el-button @click="closeOutDialog">取消</el-button>
         </span>
       </template>
@@ -195,6 +223,9 @@ import {
   addGarageInRecord,
   updateGarageOutRecord
 } from "@/api/garageRecordApi.js";
+import { listGarageVehicle } from "@/api/garageVehicleApi.js";
+import { listGarageSpacePage } from "@/api/garageSpaceApi.js";
+import { diffMinutes, calcFeeByMinutes } from "@/api/dbConfig.js";
 
 export default {
   computed: {
@@ -207,6 +238,12 @@ export default {
       payStatusOptions: [
         { value: "0", label: "未支付" },
         { value: "1", label: "已支付" }
+      ],
+      payMethodOptions: [
+        { value: "WECHAT", label: "微信支付" },
+        { value: "ALIPAY", label: "支付宝" },
+        { value: "CASH", label: "现金" },
+        { value: "FREE", label: "免单（0元）" }
       ],
       recordStatusOptions: [
         { value: "0", label: "在场" },
@@ -224,9 +261,13 @@ export default {
         pagCount: 0
       },
       recordList: [],
+      vehicleOptions: [],
+      spaceOptions: [],
       inDialog: {
         dialogVisible: false,
+        submitting: false,
         form: {
+          vehicleId: "",
           plateNo: "",
           spaceNo: "",
           inTime: "",
@@ -235,24 +276,26 @@ export default {
       },
       outDialog: {
         dialogVisible: false,
+        submitting: false,
         form: {
           id: "",
           plateNo: "",
           spaceNo: "",
+          inTime: "",
           outTime: "",
-          totalFee: "",
-          payStatus: "1"
+          parkingMinutes: "0",
+          totalFee: "0",
+          payMethod: "WECHAT"
         }
       },
       inRules: {
-        plateNo: [{ required: true, message: "请输入车牌号", trigger: "blur" }],
-        spaceNo: [{ required: true, message: "请输入车位编号", trigger: "blur" }],
+        vehicleId: [{ required: true, message: "请选择车辆", trigger: "change" }],
+        spaceNo: [{ required: true, message: "请选择车位", trigger: "change" }],
         inTime: [{ required: true, message: "请选择入场时间", trigger: "change" }]
       },
       outRules: {
         outTime: [{ required: true, message: "请选择出场时间", trigger: "change" }],
-        totalFee: [{ required: true, message: "请输入费用", trigger: "blur" }],
-        payStatus: [{ required: true, message: "请选择支付状态", trigger: "change" }]
+        payMethod: [{ required: true, message: "请选择支付方式", trigger: "change" }]
       }
     };
   },
@@ -261,15 +304,15 @@ export default {
   },
   methods: {
     formatPayStatus(value) {
-      const item = this.payStatusOptions.find((temp) => temp.value == value);
+      const item = this.payStatusOptions.find((temp) => temp.value === String(value));
       return item ? item.label : value;
     },
     formatRecordStatus(value) {
-      const item = this.recordStatusOptions.find((temp) => temp.value == value);
+      const item = this.recordStatusOptions.find((temp) => temp.value === String(value));
       return item ? item.label : value;
     },
     isCanOut(row) {
-      return row && (row.recordStatus + "") === "0";
+      return row && String(row.recordStatus) === "0";
     },
     query() {
       this.queryParams.pageSize = "1";
@@ -277,10 +320,11 @@ export default {
     },
     handleCurrentChange(curPage) {
       this.page.currentPag = curPage;
-      this.queryParams.pageSize = curPage;
+      this.queryParams.pageSize = String(curPage);
       this.getRecordList();
     },
     initInForm() {
+      this.inDialog.form.vehicleId = "";
       this.inDialog.form.plateNo = "";
       this.inDialog.form.spaceNo = "";
       this.inDialog.form.inTime = getNowDateTime();
@@ -290,16 +334,58 @@ export default {
       this.outDialog.form.id = "";
       this.outDialog.form.plateNo = "";
       this.outDialog.form.spaceNo = "";
+      this.outDialog.form.inTime = "";
       this.outDialog.form.outTime = getNowDateTime();
-      this.outDialog.form.totalFee = "";
-      this.outDialog.form.payStatus = "1";
+      this.outDialog.form.parkingMinutes = "0";
+      this.outDialog.form.totalFee = "0";
+      this.outDialog.form.payMethod = "WECHAT";
     },
     resetForm(formName) {
       if (this.$refs[formName]) {
         this.$refs[formName].resetFields();
       }
     },
-    openInDialog() {
+    async loadVehicleOptions() {
+      try {
+        const res = await listGarageVehicle();
+        if (res && res.flag) {
+          this.vehicleOptions = Array.isArray(res.data) ? res.data : [];
+        } else {
+          this.vehicleOptions = [];
+        }
+      } catch (error) {
+        this.vehicleOptions = [];
+        this.$message.error(error.userMessage || "车辆列表加载失败");
+      }
+    },
+    async loadSpaceOptions() {
+      try {
+        const res = await listGarageSpacePage({ status: "0", pageSize: "1" });
+        if (res && res.flag) {
+          this.spaceOptions = (res.data && res.data.records) || [];
+        } else {
+          this.spaceOptions = [];
+        }
+      } catch (error) {
+        this.spaceOptions = [];
+        this.$message.error(error.userMessage || "空闲车位加载失败");
+      }
+    },
+    async openInDialog() {
+      await Promise.all([this.loadVehicleOptions(), this.loadSpaceOptions()]);
+      if (this.vehicleOptions.length === 0) {
+        this.$alert("你还没有可用车辆，请先在“车辆信息管理”中新增车辆。", "提示", {
+          confirmButtonText: "去新增"
+        }).then(() => {
+          this.$router.push("/garage/vehicleManage");
+        });
+        return;
+      }
+      if (this.spaceOptions.length === 0) {
+        this.$message.warning("当前没有可用空闲车位，请稍后再试");
+        return;
+      }
+
       this.inDialog.dialogVisible = true;
       this.$nextTick(() => {
         this.initInForm();
@@ -316,9 +402,11 @@ export default {
         this.outDialog.form.id = row.id;
         this.outDialog.form.plateNo = row.plateNo;
         this.outDialog.form.spaceNo = row.spaceNo;
+        this.outDialog.form.inTime = row.inTime || "";
         this.outDialog.form.outTime = row.outTime ? row.outTime : getNowDateTime();
-        this.outDialog.form.totalFee = row.totalFee == null ? "" : row.totalFee + "";
-        this.outDialog.form.payStatus = row.payStatus == null ? "1" : row.payStatus + "";
+        this.outDialog.form.totalFee = row.totalFee == null ? "0" : String(row.totalFee);
+        this.outDialog.form.payMethod = "WECHAT";
+        this.recalculateOutFee();
       });
     },
     closeOutDialog() {
@@ -326,55 +414,134 @@ export default {
       this.resetForm("outForm");
       this.initOutForm();
     },
-    saveIn(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (!valid) {
-          return false;
-        }
-        addGarageInRecord(this.inDialog.form).then((res) => {
-          if (res.flag) {
-            this.$message.success(res.message || "入库成功");
-            this.closeInDialog();
-            this.query();
-          } else {
-            this.$message.error(res.message || "入库失败");
-          }
-        });
-      });
+    onOutTimeChange() {
+      this.recalculateOutFee();
     },
-    saveOut(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (!valid) {
-          return false;
-        }
-        updateGarageOutRecord(this.outDialog.form).then((res) => {
-          if (res.flag) {
-            this.$message.success(res.message || "出库成功");
-            this.closeOutDialog();
-            this.getRecordList();
-          } else {
-            this.$message.error(res.message || "出库失败");
-          }
-        });
-      });
+    recalculateOutFee() {
+      const minutes = diffMinutes(this.outDialog.form.inTime, this.outDialog.form.outTime);
+      this.outDialog.form.parkingMinutes = minutes === "" ? "0" : minutes;
+      this.outDialog.form.totalFee = calcFeeByMinutes(this.outDialog.form.parkingMinutes);
+      if (String(this.outDialog.form.totalFee) === "0") {
+        this.outDialog.form.payMethod = "FREE";
+      } else if (this.outDialog.form.payMethod === "FREE") {
+        this.outDialog.form.payMethod = "WECHAT";
+      }
     },
-    getRecordList() {
-      listGarageRecordPage(this.queryParams)
-        .then((res) => {
-          if (!res || res.flag === false) {
-            this.recordList = [];
-            return;
-          }
-          const data = res.data || {};
-          this.recordList = data.records || [];
-          this.page.total = data.total || 0;
-          this.page.pageSize = data.size || 6;
-          this.page.currentPag = data.current || 1;
-          this.page.pagCount = data.pages || 0;
-        })
-        .catch(() => {
+    isOutTimeValid() {
+      const inMs = new Date(this.outDialog.form.inTime).getTime();
+      const outMs = new Date(this.outDialog.form.outTime).getTime();
+      if (Number.isNaN(inMs) || Number.isNaN(outMs)) {
+        return false;
+      }
+      return outMs >= inMs;
+    },
+    async saveIn(formName) {
+      if (this.inDialog.submitting) {
+        return;
+      }
+      const formRef = this.$refs[formName];
+      if (!formRef) {
+        return;
+      }
+
+      try {
+        await formRef.validate();
+      } catch (error) {
+        return;
+      }
+
+      const selectedVehicle = this.vehicleOptions.find((item) => item.id === this.inDialog.form.vehicleId);
+      if (!selectedVehicle || !selectedVehicle.plateNo) {
+        this.$message.warning("请选择有效车辆");
+        return;
+      }
+
+      try {
+        this.inDialog.submitting = true;
+        const payload = {
+          plateNo: selectedVehicle.plateNo,
+          spaceNo: this.inDialog.form.spaceNo,
+          inTime: this.inDialog.form.inTime,
+          remark: (this.inDialog.form.remark || "").trim()
+        };
+        const res = await addGarageInRecord(payload);
+        if (res && res.flag) {
+          this.$message.success(res.message || "入库成功");
+          this.closeInDialog();
+          this.query();
+          return;
+        }
+        this.$message.error((res && res.message) || "入库失败");
+      } catch (error) {
+        this.$message.error(error.userMessage || "入库失败，请稍后重试");
+      } finally {
+        this.inDialog.submitting = false;
+      }
+    },
+    async saveOut(formName) {
+      if (this.outDialog.submitting) {
+        return;
+      }
+      const formRef = this.$refs[formName];
+      if (!formRef) {
+        return;
+      }
+
+      try {
+        await formRef.validate();
+      } catch (error) {
+        return;
+      }
+
+      if (!this.isOutTimeValid()) {
+        this.$message.warning("出场时间不能早于入场时间");
+        return;
+      }
+
+      try {
+        this.outDialog.submitting = true;
+        const payload = {
+          id: this.outDialog.form.id,
+          plateNo: this.outDialog.form.plateNo,
+          spaceNo: this.outDialog.form.spaceNo,
+          outTime: this.outDialog.form.outTime,
+          totalFee: String(this.outDialog.form.totalFee).trim(),
+          payMethod: this.outDialog.form.payMethod
+        };
+        const res = await updateGarageOutRecord(payload);
+        if (res && res.flag) {
+          this.$message.success(res.message || "出库成功");
+          this.closeOutDialog();
+          this.getRecordList();
+          return;
+        }
+        this.$message.error((res && res.message) || "出库失败");
+      } catch (error) {
+        this.$message.error(error.userMessage || "出库失败，请稍后重试");
+      } finally {
+        this.outDialog.submitting = false;
+      }
+    },
+    async getRecordList() {
+      try {
+        const res = await listGarageRecordPage(this.queryParams);
+        if (!res || res.flag === false) {
           this.recordList = [];
-        });
+          if (res && res.message) {
+            this.$message.error(res.message);
+          }
+          return;
+        }
+        const data = res.data || {};
+        this.recordList = data.records || [];
+        this.page.total = data.total || 0;
+        this.page.pageSize = data.size || 6;
+        this.page.currentPag = data.current || 1;
+        this.page.pagCount = data.pages || 0;
+      } catch (error) {
+        this.recordList = [];
+        this.$message.error(error.userMessage || "停车记录加载失败");
+      }
     }
   }
 };

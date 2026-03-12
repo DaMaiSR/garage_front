@@ -2,9 +2,28 @@ import { createStore } from "vuex";
 import { getSessionStorage, setSessionStorage } from "@/utils/common.js";
 import { getMenusByRole, ROLE_USER } from "@/api/dbConfig.js";
 
+function isChineseMenuList(menuList) {
+  if (!Array.isArray(menuList) || menuList.length === 0) {
+    return false;
+  }
+  return menuList.every((menu) => {
+    const menuTitle = String((menu && menu.title) || "");
+    if (/[A-Za-z]/.test(menuTitle)) {
+      return false;
+    }
+    if (!Array.isArray(menu.children)) {
+      return true;
+    }
+    return menu.children.every((child) => {
+      const childTitle = String((child && child.title) || "");
+      return !/[A-Za-z]/.test(childTitle);
+    });
+  });
+}
+
 function resolveInitialMenus() {
   const cachedMenus = getSessionStorage("menuList");
-  if (Array.isArray(cachedMenus) && cachedMenus.length > 0) {
+  if (isChineseMenuList(cachedMenus)) {
     return cachedMenus;
   }
   const user = getSessionStorage("user");

@@ -5,7 +5,7 @@
       <div class="monitor-actions">
         <span class="server-time">服务器时间：{{ serverTime }}</span>
         <span class="conn" :class="wsConnected ? 'ok' : 'warn'">
-          {{ wsConnected ? "WebSocket已连接" : "WebSocket未连接" }}
+          {{ wsConnected ? "实时通道已连接" : "实时通道未连接" }}
         </span>
         <el-button type="primary" @click="loadData">刷新</el-button>
       </div>

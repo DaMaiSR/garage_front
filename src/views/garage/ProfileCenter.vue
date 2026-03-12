@@ -40,7 +40,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="角色">
-              <el-input v-model="profileForm.role" disabled />
+              <el-input v-model="roleLabel" disabled />
             </el-form-item>
           </el-col>
         </el-row>
@@ -71,11 +71,11 @@
         <el-row :gutter="12">
           <el-col :span="12">
             <el-form-item label="新密码">
-              <el-input v-model="profileForm.password" type="password" show-password />
+              <el-input v-model="profileForm.password" type="password" show-password placeholder="不修改请留空" />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-button type="primary" @click="saveProfile">保存资料</el-button>
+        <el-button type="primary" :loading="saving" @click="saveProfile">保存资料</el-button>
       </el-form>
     </el-card>
 
@@ -88,7 +88,9 @@
         <el-table-column prop="plateNo" label="车牌号" align="center" />
         <el-table-column prop="ownerName" label="车主" align="center" />
         <el-table-column prop="ownerPhone" label="联系电话" align="center" />
-        <el-table-column prop="status" label="状态" align="center" />
+        <el-table-column prop="status" label="状态" align="center">
+          <template #default="scope">{{ formatVehicleStatus(scope.row.status) }}</template>
+        </el-table-column>
       </el-table>
     </el-card>
 
@@ -121,7 +123,7 @@
         <el-table-column prop="outTime" label="出库时间" align="center" />
         <el-table-column prop="recordStatus" label="状态" align="center">
           <template #default="scope">
-            {{ scope.row.recordStatus === "0" ? "在库" : "已出库" }}
+            {{ String(scope.row.recordStatus) === "0" ? "在库" : "已出库" }}
           </template>
         </el-table-column>
       </el-table>
@@ -135,6 +137,7 @@ import { profileSummary, updateProfile } from "@/api/userApi.js";
 export default {
   data() {
     return {
+      saving: false,
       summary: {
         user: {},
         vehicles: [],
@@ -157,10 +160,18 @@ export default {
       }
     };
   },
+  computed: {
+    roleLabel() {
+      return this.profileForm.role === "admin" ? "管理员" : "用户";
+    }
+  },
   mounted() {
     this.loadSummary();
   },
   methods: {
+    formatVehicleStatus(value) {
+      return String(value) === "1" ? "启用" : "停用";
+    },
     formatReservationStatus(value) {
       const map = {
         "0": "预约中",
@@ -178,35 +189,64 @@ export default {
       this.profileForm.licenseType = user.licenseType || "";
       this.profileForm.password = "";
     },
-    loadSummary() {
-      profileSummary().then((res) => {
+    async loadSummary() {
+      try {
+        const res = await profileSummary();
         if (!res || !res.flag) {
           this.$message.error((res && res.message) || "加载失败");
           return;
         }
         this.summary = res.data || this.summary;
         this.fillProfile(this.summary.user || {});
-      });
+      } catch (error) {
+        this.$message.error(error.userMessage || "加载失败，请稍后重试");
+      }
     },
-    saveProfile() {
-      const payload = {
-        displayName: this.profileForm.displayName,
-        phone: this.profileForm.phone,
-        licenseNo: this.profileForm.licenseNo,
-        licenseType: this.profileForm.licenseType
-      };
-      if (this.profileForm.password) {
-        payload.password = this.profileForm.password;
+    validateProfile() {
+      const phone = String(this.profileForm.phone || "").trim();
+      if (phone && !/^1\d{10}$/.test(phone)) {
+        this.$message.warning("手机号格式不正确");
+        return false;
+      }
+      const password = String(this.profileForm.password || "").trim();
+      if (password && password.length < 6) {
+        this.$message.warning("新密码至少6位");
+        return false;
+      }
+      return true;
+    },
+    async saveProfile() {
+      if (this.saving) {
+        return;
+      }
+      if (!this.validateProfile()) {
+        return;
       }
 
-      updateProfile(payload).then((res) => {
+      const payload = {
+        displayName: String(this.profileForm.displayName || "").trim(),
+        phone: String(this.profileForm.phone || "").trim(),
+        licenseNo: String(this.profileForm.licenseNo || "").trim(),
+        licenseType: String(this.profileForm.licenseType || "").trim()
+      };
+      if (this.profileForm.password) {
+        payload.password = String(this.profileForm.password).trim();
+      }
+
+      try {
+        this.saving = true;
+        const res = await updateProfile(payload);
         if (res && res.flag) {
           this.$message.success(res.message || "保存成功");
           this.loadSummary();
         } else {
           this.$message.error((res && res.message) || "保存失败");
         }
-      });
+      } catch (error) {
+        this.$message.error(error.userMessage || "保存失败，请稍后重试");
+      } finally {
+        this.saving = false;
+      }
     }
   }
 };
