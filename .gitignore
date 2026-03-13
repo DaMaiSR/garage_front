@@ -1,1 +1,46 @@
-node_modules
+# --- Dependencies ---
+node_modules/
+.pnpm-store/
+.npm/
+.yarn/
+
+# --- Build / Output ---
+dist/
+build/
+coverage/
+target/
+out/
+
+# --- Runtime / Logs ---
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.pid
+*.seed
+
+# --- Env files ---
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# --- Cache / Temp ---
+.cache/
+.eslintcache
+.stylelintcache
+tmp/
+temp/
+*.tmp
+
+# --- IDE / Editor ---
+.idea/
+*.iml
+.vscode/
+
+# --- OS files ---
+.DS_Store
+Thumbs.db
+Desktop.ini
