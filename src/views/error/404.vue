@@ -14,11 +14,16 @@
   justify-content: center;
   align-items: center;
   gap: 12px;
+  color: #d8e8ff;
+  background:
+    radial-gradient(circle at 14% 14%, rgba(66, 124, 255, 0.22), transparent 40%),
+    radial-gradient(circle at 88% 2%, rgba(73, 176, 255, 0.18), transparent 40%),
+    linear-gradient(180deg, #08102d 0%, #060b1c 100%);
 }
 
 h1 {
   font-size: 64px;
-  color: #1f6eb3;
+  color: #78b3ff;
+  letter-spacing: 2px;
 }
 </style>
-

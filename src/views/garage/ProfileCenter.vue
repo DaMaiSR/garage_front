@@ -1,133 +1,142 @@
 <template>
   <div class="profile-wrap">
-    <el-row :gutter="12" class="stat-row">
-      <el-col :span="6">
-        <div class="stat-card">
-          <div class="label">车辆数</div>
-          <div class="value">{{ summary.vehicleCount }}</div>
+    <div class="page-shell">
+      <div class="page-hero">
+        <div class="page-hero-title">
+          <h2>个人中心</h2>
+          <p>集中查看账号概览、编辑个人资料，并追踪近期预约与停车动态。</p>
         </div>
-      </el-col>
-      <el-col :span="6">
-        <div class="stat-card">
-          <div class="label">驾驶档案数</div>
-          <div class="value">{{ summary.driverProfileCount }}</div>
-        </div>
-      </el-col>
-      <el-col :span="6">
-        <div class="stat-card">
-          <div class="label">当前预约</div>
-          <div class="value">{{ summary.activeReservationCount }}</div>
-        </div>
-      </el-col>
-      <el-col :span="6">
-        <div class="stat-card">
-          <div class="label">当前在库</div>
-          <div class="value">{{ summary.activeParkingCount }}</div>
-        </div>
-      </el-col>
-    </el-row>
+      </div>
 
-    <el-card shadow="never">
-      <template #header>
-        <div class="card-header">个人资料</div>
-      </template>
-      <el-form :model="profileForm" label-width="90px" style="max-width: 680px" @submit.prevent>
-        <el-row :gutter="12">
-          <el-col :span="12">
-            <el-form-item label="用户名">
-              <el-input v-model="profileForm.username" disabled />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="角色">
-              <el-input v-model="roleLabel" disabled />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="12">
-          <el-col :span="12">
-            <el-form-item label="显示名称">
-              <el-input v-model="profileForm.displayName" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="手机号">
-              <el-input v-model="profileForm.phone" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="12">
-          <el-col :span="12">
-            <el-form-item label="证件号">
-              <el-input v-model="profileForm.licenseNo" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="证件类型">
-              <el-input v-model="profileForm.licenseType" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="12">
-          <el-col :span="12">
-            <el-form-item label="新密码">
-              <el-input v-model="profileForm.password" type="password" show-password placeholder="不修改请留空" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-button type="primary" :loading="saving" @click="saveProfile">保存资料</el-button>
-      </el-form>
-    </el-card>
+      <el-row :gutter="12" class="stat-row">
+        <el-col :xs="12" :sm="12" :md="6">
+          <div class="stat-card">
+            <div class="label">车辆数</div>
+            <div class="value">{{ summary.vehicleCount }}</div>
+          </div>
+        </el-col>
+        <el-col :xs="12" :sm="12" :md="6">
+          <div class="stat-card">
+            <div class="label">驾驶档案数</div>
+            <div class="value">{{ summary.driverProfileCount }}</div>
+          </div>
+        </el-col>
+        <el-col :xs="12" :sm="12" :md="6">
+          <div class="stat-card">
+            <div class="label">当前预约</div>
+            <div class="value">{{ summary.activeReservationCount }}</div>
+          </div>
+        </el-col>
+        <el-col :xs="12" :sm="12" :md="6">
+          <div class="stat-card">
+            <div class="label">当前在库</div>
+            <div class="value">{{ summary.activeParkingCount }}</div>
+          </div>
+        </el-col>
+      </el-row>
 
-    <el-card shadow="never" style="margin-top: 12px">
-      <template #header>
-        <div class="card-header">我的车辆</div>
-      </template>
-      <el-table :data="summary.vehicles" stripe>
-        <el-table-column type="index" label="序号" width="60" align="center" />
-        <el-table-column prop="plateNo" label="车牌号" align="center" />
-        <el-table-column prop="ownerName" label="车主" align="center" />
-        <el-table-column prop="ownerPhone" label="联系电话" align="center" />
-        <el-table-column prop="status" label="状态" align="center">
-          <template #default="scope">{{ formatVehicleStatus(scope.row.status) }}</template>
-        </el-table-column>
-      </el-table>
-    </el-card>
+      <el-card shadow="never" class="content-card">
+        <template #header>
+          <div class="card-header">个人资料</div>
+        </template>
+        <el-form :model="profileForm" label-width="90px" style="max-width: 680px" @submit.prevent>
+          <el-row :gutter="12">
+            <el-col :span="12">
+              <el-form-item label="用户名">
+                <el-input v-model="profileForm.username" disabled />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="角色">
+                <el-input v-model="roleLabel" disabled />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="12">
+            <el-col :span="12">
+              <el-form-item label="显示名称">
+                <el-input v-model="profileForm.displayName" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="手机号">
+                <el-input v-model="profileForm.phone" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="12">
+            <el-col :span="12">
+              <el-form-item label="证件号">
+                <el-input v-model="profileForm.licenseNo" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="证件类型">
+                <el-input v-model="profileForm.licenseType" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="12">
+            <el-col :span="12">
+              <el-form-item label="新密码">
+                <el-input v-model="profileForm.password" type="password" show-password placeholder="不修改请留空" />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-button type="primary" class="toolbar-strong" :loading="saving" @click="saveProfile">保存资料</el-button>
+        </el-form>
+      </el-card>
 
-    <el-card shadow="never" style="margin-top: 12px">
-      <template #header>
-        <div class="card-header">最近预约</div>
-      </template>
-      <el-table :data="summary.reservations" stripe>
-        <el-table-column type="index" label="序号" width="60" align="center" />
-        <el-table-column prop="plateNo" label="车牌号" align="center" />
-        <el-table-column prop="spaceNo" label="车位号" align="center" />
-        <el-table-column prop="reservationTime" label="预约时间" align="center" />
-        <el-table-column prop="reservationStatus" label="状态" align="center">
-          <template #default="scope">
-            {{ formatReservationStatus(scope.row.reservationStatus) }}
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-card>
+      <el-card shadow="never" class="content-card">
+        <template #header>
+          <div class="card-header">我的车辆</div>
+        </template>
+        <el-table :data="summary.vehicles" stripe>
+          <el-table-column type="index" label="序号" width="60" align="center" />
+          <el-table-column prop="plateNo" label="车牌号" align="center" />
+          <el-table-column prop="ownerName" label="车主" align="center" />
+          <el-table-column prop="ownerPhone" label="联系电话" align="center" />
+          <el-table-column prop="status" label="状态" align="center">
+            <template #default="scope">{{ formatVehicleStatus(scope.row.status) }}</template>
+          </el-table-column>
+        </el-table>
+      </el-card>
 
-    <el-card shadow="never" style="margin-top: 12px">
-      <template #header>
-        <div class="card-header">最近停车记录</div>
-      </template>
-      <el-table :data="summary.parkingRecords" stripe>
-        <el-table-column type="index" label="序号" width="60" align="center" />
-        <el-table-column prop="plateNo" label="车牌号" align="center" />
-        <el-table-column prop="spaceNo" label="车位号" align="center" />
-        <el-table-column prop="inTime" label="入库时间" align="center" />
-        <el-table-column prop="outTime" label="出库时间" align="center" />
-        <el-table-column prop="recordStatus" label="状态" align="center">
-          <template #default="scope">
-            {{ String(scope.row.recordStatus) === "0" ? "在库" : "已出库" }}
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-card>
+      <el-card shadow="never" class="content-card">
+        <template #header>
+          <div class="card-header">最近预约</div>
+        </template>
+        <el-table :data="summary.reservations" stripe>
+          <el-table-column type="index" label="序号" width="60" align="center" />
+          <el-table-column prop="plateNo" label="车牌号" align="center" />
+          <el-table-column prop="spaceNo" label="车位号" align="center" />
+          <el-table-column prop="reservationTime" label="预约时间" align="center" />
+          <el-table-column prop="reservationStatus" label="状态" align="center">
+            <template #default="scope">
+              {{ formatReservationStatus(scope.row.reservationStatus) }}
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-card>
+
+      <el-card shadow="never" class="content-card">
+        <template #header>
+          <div class="card-header">最近停车记录</div>
+        </template>
+        <el-table :data="summary.parkingRecords" stripe>
+          <el-table-column type="index" label="序号" width="60" align="center" />
+          <el-table-column prop="plateNo" label="车牌号" align="center" />
+          <el-table-column prop="spaceNo" label="车位号" align="center" />
+          <el-table-column prop="inTime" label="入库时间" align="center" />
+          <el-table-column prop="outTime" label="出库时间" align="center" />
+          <el-table-column prop="recordStatus" label="状态" align="center">
+            <template #default="scope">
+              {{ String(scope.row.recordStatus) === "0" ? "在库" : "已出库" }}
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-card>
+    </div>
   </div>
 </template>
 
@@ -254,27 +263,29 @@ export default {
 
 <style scoped>
 .profile-wrap {
-  padding: 8px 6px 16px;
+  padding: 8px 4px 16px;
 }
 
 .stat-row {
-  margin-bottom: 12px;
+  margin-bottom: 2px;
 }
 
 .stat-card {
-  background: linear-gradient(140deg, #235f9d, #3a89d2);
-  color: #fff;
-  border-radius: 8px;
+  background: linear-gradient(140deg, rgba(41, 116, 224, 0.92), rgba(33, 87, 187, 0.92));
+  color: #eff6ff;
+  border-radius: 10px;
+  border: 1px solid rgba(113, 161, 255, 0.36);
   min-height: 84px;
   padding: 14px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  box-shadow: 0 10px 20px rgba(7, 18, 48, 0.32);
 }
 
 .label {
   font-size: 13px;
-  opacity: 0.9;
+  opacity: 0.88;
 }
 
 .value {
@@ -285,5 +296,10 @@ export default {
 
 .card-header {
   font-weight: 600;
+  color: #d8e8ff;
+}
+
+.content-card + .content-card {
+  margin-top: 12px;
 }
 </style>

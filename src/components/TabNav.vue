@@ -35,46 +35,58 @@ export default {
 
 <style scoped>
 .container_tab {
-  padding-left: 20px;
-  border-bottom: 1px solid #d8dce5;
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid rgba(89, 141, 255, 0.24);
+  background: rgba(11, 21, 54, 0.58);
 }
 
 .tab_nav_box {
   display: flex;
   align-items: center;
-  padding: 2px 0;
+  padding: 0;
+  margin: 0;
 }
 
 .tab_nav_box li {
-  height: 28px;
-  line-height: 28px;
-  padding: 1px;
+  min-height: 30px;
+  line-height: 30px;
   display: flex;
   align-items: center;
   margin-right: 8px;
-  border: 1px solid #cccccc;
-  border-radius: 5%;
-  opacity: 0.9;
+  border: 1px solid rgba(89, 141, 255, 0.28);
+  border-radius: 8px;
+  background: rgba(20, 35, 84, 0.84);
+  color: #9ab8e8;
+  transition: all 0.2s ease;
+}
+
+.tab_nav_box li:hover {
+  border-color: rgba(89, 141, 255, 0.45);
+  color: #d8e8ff;
 }
 
 .tab_nav_box li a {
-  padding-left: 10px;
-  padding-right: 10px;
+  padding: 0 10px;
   display: inline-block;
-  color: #000000;
 }
 
 .tab_nav_box li:nth-child(n + 2) a {
-  padding-right: 15px;
+  padding-right: 14px;
 }
 
 .tab_nav_box li.active {
-  font-size: 15px;
-  background-color: #0b67b8;
-  color: white;
+  background: linear-gradient(180deg, #2e87f6, #2060c9);
+  border-color: rgba(120, 169, 255, 0.6);
+  color: #ffffff;
 }
 
 .tab_nav_box li.active a {
   color: #ffffff;
+}
+
+.tab_nav_box li :deep(.el-icon) {
+  margin-right: 8px;
+  cursor: pointer;
+  color: inherit;
 }
 </style>

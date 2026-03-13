@@ -2,91 +2,109 @@
   <div class="common-layout">
     <el-container>
       <el-header>
-        <el-row :gutter="20">
-          <el-col :span="6">
-            <el-input
-              v-model="queryParams.plateNo"
-              placeholder="车牌号"
-              clearable
-              @clear="query"
-            >
-              <template #append>
-                <el-button type="info" @click="query" style="color: black">查询</el-button>
-              </template>
-            </el-input>
-          </el-col>
-          <el-col :span="5">
-            <el-select
-              v-model="queryParams.recordStatus"
-              placeholder="在场状态"
-              clearable
-              style="width: 100%"
-              @change="query"
-            >
-              <el-option
-                v-for="item in recordStatusOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </el-col>
-          <el-col :span="13">
-            <el-button type="primary" color="#337ab7" @click="openInDialog">
-              <el-icon><Plus /></el-icon>
-              <span>停车入库</span>
-            </el-button>
-          </el-col>
-        </el-row>
+        <div class="page-shell">
+          <div class="page-hero">
+            <div class="page-hero-title">
+              <h2>停车记录</h2>
+              <p>统一处理车辆入库与出库结算，费用按停车时长自动计算。</p>
+            </div>
+            <div class="page-hero-actions">
+              <el-button type="primary" class="toolbar-strong" @click="openInDialog">
+                <el-icon><Plus /></el-icon>
+                <span>停车入库</span>
+              </el-button>
+            </div>
+          </div>
+
+          <div class="filter-card">
+            <div class="panel-head">
+              <h3 class="panel-title">筛选条件</h3>
+              <span class="panel-hint">支持按车牌与在场状态快速检索</span>
+            </div>
+            <el-row :gutter="12" class="filter-grid">
+              <el-col :xs="24" :sm="12" :md="8" :lg="7">
+                <label class="input-label">车牌号</label>
+                <el-input
+                  v-model="queryParams.plateNo"
+                  placeholder="车牌号"
+                  clearable
+                  @clear="query"
+                >
+                  <template #append>
+                    <el-button type="info" class="toolbar-subtle" @click="query">查询</el-button>
+                  </template>
+                </el-input>
+              </el-col>
+              <el-col :xs="24" :sm="12" :md="6" :lg="5">
+                <label class="input-label">在场状态</label>
+                <el-select
+                  v-model="queryParams.recordStatus"
+                  placeholder="在场状态"
+                  clearable
+                  style="width: 100%"
+                  @change="query"
+                >
+                  <el-option
+                    v-for="item in recordStatusOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-col>
+            </el-row>
+            <div class="ops-note">出库结算时系统会自动计算费用，并需选择支付方式完成支付后出库。</div>
+          </div>
+        </div>
       </el-header>
 
       <el-divider style="margin: 0" />
 
       <el-main>
-        <el-alert
-          title="出库结算时系统会自动计算费用，并需选择支付方式完成支付后出库。"
-          type="info"
-          :closable="false"
-          style="margin-bottom: 12px"
-        />
-        <el-table :data="recordList" style="width: 100%; color: black" stripe>
-          <el-table-column align="center" type="index" :index="indexMethod" label="序号" width="60" />
-          <el-table-column align="center" prop="plateNo" label="车牌号" width="130" />
-          <el-table-column align="center" prop="spaceNo" label="车位编号" width="120" />
-          <el-table-column align="center" prop="inTime" label="入场时间" width="170" />
-          <el-table-column align="center" prop="outTime" label="出场时间" width="170" />
-          <el-table-column align="center" prop="parkingMinutes" label="停车时长(分钟)" width="130" />
-          <el-table-column align="center" prop="totalFee" label="费用(元)" width="100" />
-          <el-table-column align="center" prop="payStatus" label="支付状态" width="100">
-            <template #default="scope">{{ formatPayStatus(scope.row.payStatus) }}</template>
-          </el-table-column>
-          <el-table-column align="center" prop="recordStatus" label="在场状态" width="100">
-            <template #default="scope">{{ formatRecordStatus(scope.row.recordStatus) }}</template>
-          </el-table-column>
-          <el-table-column align="center" fixed="right" label="操作" width="150">
-            <template #default="scope">
-              <el-button
-                type="warning"
-                icon="Switch"
-                link
-                v-if="isCanOut(scope.row)"
-                @click="openOutDialog(scope.row)"
-              >
-                出库结算
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+        <div class="table-card">
+          <div class="panel-head">
+            <h3 class="panel-title">停车记录列表</h3>
+            <span class="panel-hint">共 {{ page.total }} 条</span>
+          </div>
+          <el-table :data="recordList" style="width: 100%" stripe>
+            <el-table-column align="center" type="index" :index="indexMethod" label="序号" width="60" />
+            <el-table-column align="center" prop="plateNo" label="车牌号" width="130" />
+            <el-table-column align="center" prop="spaceNo" label="车位编号" width="120" />
+            <el-table-column align="center" prop="inTime" label="入场时间" width="170" />
+            <el-table-column align="center" prop="outTime" label="出场时间" width="170" />
+            <el-table-column align="center" prop="parkingMinutes" label="停车时长(分钟)" width="130" />
+            <el-table-column align="center" prop="totalFee" label="费用(元)" width="100" />
+            <el-table-column align="center" prop="payStatus" label="支付状态" width="100">
+              <template #default="scope">{{ formatPayStatus(scope.row.payStatus) }}</template>
+            </el-table-column>
+            <el-table-column align="center" prop="recordStatus" label="在场状态" width="100">
+              <template #default="scope">{{ formatRecordStatus(scope.row.recordStatus) }}</template>
+            </el-table-column>
+            <el-table-column align="center" fixed="right" label="操作" width="150">
+              <template #default="scope">
+                <el-button
+                  type="warning"
+                  icon="Switch"
+                  link
+                  v-if="isCanOut(scope.row)"
+                  @click="openOutDialog(scope.row)"
+                >
+                  出库结算
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
 
-        <div style="margin-top: 15px">
-          <el-pagination
-            :page-size="page.pageSize"
-            background
-            :current-page="page.currentPag"
-            layout=" prev, pager, next"
-            :total="page.total"
-            @current-change="handleCurrentChange"
-          />
+          <div style="margin-top: 15px">
+            <el-pagination
+              :page-size="page.pageSize"
+              background
+              :current-page="page.currentPag"
+              layout=" prev, pager, next"
+              :total="page.total"
+              @current-change="handleCurrentChange"
+            />
+          </div>
         </div>
       </el-main>
     </el-container>

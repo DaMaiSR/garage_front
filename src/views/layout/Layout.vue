@@ -1,7 +1,7 @@
 <template>
-  <el-container style="height: 100%">
+  <el-container class="layout-shell">
     <Aside />
-    <el-container direction="vertical">
+    <el-container direction="vertical" class="layout-main">
       <HeaderCom />
       <TabNav />
       <el-main>
@@ -27,23 +27,23 @@ export default {
 </script>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
+.layout-shell {
+  min-height: 100%;
+  padding: 12px;
+  gap: 12px;
 }
 
-html,
-body,
-#app,
-.el-container,
-#asideNav,
-ul.el-menu {
-  height: 100%;
+.layout-main {
+  border: 1px solid rgba(89, 141, 255, 0.28);
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(13, 26, 66, 0.84), rgba(9, 18, 49, 0.9));
 }
 
-body {
-  font-size: 14px;
-  color: #333;
+@media (max-width: 1024px) {
+  .layout-shell {
+    padding: 8px;
+    gap: 8px;
+  }
 }
 </style>
-

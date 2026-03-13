@@ -23,7 +23,7 @@ npm run build
 ### 普通用户
 - 登录/注册
 - 车位查询
-- 停车预约（创建/取消/转入库）
+- 停车预约（创建/取消）
 - 我的车位
 - 停车记录（入库/出库）
 - 车辆信息管理
@@ -33,7 +33,7 @@ npm run build
 ### 管理员
 - 登录/注销
 - 车位管理
-- 预约管理
+- 预约管理（含预约转入库）
 - 驾驶档案管理
 - 车辆信息管理
 - 实时监控（WebSocket + REST）
@@ -46,3 +46,13 @@ npm run build
 1. 先启动后端并完成数据库初始化/迁移。
 2. 登录后前端自动加载后端返回菜单。
 3. 实时监控页会优先走 WebSocket，失败时使用 REST 刷新兜底。
+
+## 5. 扩展能力（答辩可讲）
+- 已预留移动支付编排接口：
+  - `POST /payment/createCheckoutOrder`
+  - `GET /payment/queryCheckoutOrder`
+  - `POST /payment/completeCheckout`
+- 已预留车牌识别开放集成接口：
+  - `POST /open/integration/plate/analyze`
+  - `POST /open/integration/payment/mock/paid`
+- 集成接口使用 `X-Integration-Key`，与用户 JWT 鉴权分离，便于后续接入硬件与第三方平台。

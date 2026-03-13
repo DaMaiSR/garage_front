@@ -2,105 +2,126 @@
   <div class="common-layout">
     <el-container>
       <el-header>
-        <el-row :gutter="20">
-          <el-col :span="5">
-            <el-input
-              v-model="queryParams.plateNo"
-              placeholder="车牌号"
-              clearable
-              @clear="query"
-            >
-              <template #append>
-                <el-button type="info" style="color: black" @click="query">查询</el-button>
-              </template>
-            </el-input>
-          </el-col>
-          <el-col :span="5">
-            <el-input
-              v-model="queryParams.spaceNo"
-              placeholder="车位编号"
-              clearable
-              @clear="query"
-            />
-          </el-col>
-          <el-col :span="5">
-            <el-select
-              v-model="queryParams.reservationStatus"
-              placeholder="预约状态"
-              clearable
-              style="width: 100%"
-              @change="query"
-            >
-              <el-option
-                v-for="item in reservationStatusOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </el-col>
-          <el-col :span="9">
-            <el-button type="primary" color="#337ab7" @click="openCreateDialog">
-              <el-icon><Plus /></el-icon>
-              <span>新增预约</span>
-            </el-button>
-          </el-col>
-        </el-row>
+        <div class="page-shell">
+          <div class="page-hero">
+            <div class="page-hero-title">
+              <h2>预约管理</h2>
+              <p>用户可发起预约，管理员可进行“预约转入库”，流程状态清晰可追踪。</p>
+            </div>
+            <div class="page-hero-actions">
+              <el-button type="primary" class="toolbar-strong" @click="openCreateDialog">
+                <el-icon><Plus /></el-icon>
+                <span>新增预约</span>
+              </el-button>
+            </div>
+          </div>
+
+          <div class="filter-card">
+            <div class="panel-head">
+              <h3 class="panel-title">筛选条件</h3>
+              <span class="panel-hint">可按车牌、车位和状态定位预约记录</span>
+            </div>
+            <el-row :gutter="12" class="filter-grid">
+              <el-col :xs="24" :sm="12" :md="6" :lg="5">
+                <label class="input-label">车牌号</label>
+                <el-input
+                  v-model="queryParams.plateNo"
+                  placeholder="车牌号"
+                  clearable
+                  @clear="query"
+                >
+                  <template #append>
+                    <el-button type="info" class="toolbar-subtle" @click="query">查询</el-button>
+                  </template>
+                </el-input>
+              </el-col>
+              <el-col :xs="24" :sm="12" :md="6" :lg="5">
+                <label class="input-label">车位编号</label>
+                <el-input
+                  v-model="queryParams.spaceNo"
+                  placeholder="车位编号"
+                  clearable
+                  @clear="query"
+                />
+              </el-col>
+              <el-col :xs="24" :sm="12" :md="6" :lg="5">
+                <label class="input-label">预约状态</label>
+                <el-select
+                  v-model="queryParams.reservationStatus"
+                  placeholder="预约状态"
+                  clearable
+                  style="width: 100%"
+                  @change="query"
+                >
+                  <el-option
+                    v-for="item in reservationStatusOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-col>
+            </el-row>
+            <div class="ops-note">预约前请先完善驾驶档案和车辆信息；同一车辆同一时间仅允许一个有效预约。</div>
+          </div>
+        </div>
       </el-header>
 
       <el-divider style="margin: 0" />
 
       <el-main>
-        <el-alert
-          title="预约前请先完善驾驶档案和车辆信息；一个车辆同一时间仅允许一个有效预约。"
-          type="info"
-          :closable="false"
-          style="margin-bottom: 12px"
-        />
-        <el-table :data="reservationList" style="width: 100%; color: black" stripe>
-          <el-table-column align="center" type="index" :index="indexMethod" label="序号" width="60" />
-          <el-table-column align="center" prop="plateNo" label="车牌号" width="130" />
-          <el-table-column align="center" prop="spaceNo" label="车位编号" width="130" />
-          <el-table-column align="center" prop="reservationTime" label="预约时间" width="170" />
-          <el-table-column align="center" prop="checkInTime" label="入库时间" width="170" />
-          <el-table-column align="center" prop="cancelTime" label="取消时间" width="170" />
-          <el-table-column align="center" prop="reservationStatus" label="预约状态" width="110">
-            <template #default="scope">{{ formatReservationStatus(scope.row.reservationStatus) }}</template>
-          </el-table-column>
-          <el-table-column align="center" prop="remark" label="备注" min-width="150" />
-          <el-table-column align="center" fixed="right" label="操作" width="180">
-            <template #default="scope">
-              <el-button
-                v-if="isAdmin && scope.row.reservationStatus === '0'"
-                type="warning"
-                icon="Van"
-                link
-                @click="checkIn(scope.row.id)"
-              >
-                转入库
-              </el-button>
-              <el-button
-                v-if="scope.row.reservationStatus === '0'"
-                type="danger"
-                icon="Close"
-                link
-                @click="cancel(scope.row.id)"
-              >
-                取消
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+        <div class="table-card">
+          <div class="panel-head">
+            <h3 class="panel-title">预约列表</h3>
+            <span class="panel-hint">共 {{ page.total }} 条</span>
+          </div>
+          <el-table :data="reservationList" style="width: 100%" stripe>
+            <el-table-column align="center" type="index" :index="indexMethod" label="序号" width="60" />
+            <el-table-column align="center" prop="plateNo" label="车牌号" width="130" />
+            <el-table-column align="center" prop="spaceNo" label="车位编号" width="130" />
+            <el-table-column align="center" prop="reservationTime" label="预约时间" width="170" />
+            <el-table-column align="center" prop="checkInTime" label="入库时间" width="170" />
+            <el-table-column align="center" prop="cancelTime" label="取消时间" width="170" />
+            <el-table-column align="center" prop="reservationStatus" label="预约状态" width="110">
+              <template #default="scope">{{ formatReservationStatus(scope.row.reservationStatus) }}</template>
+            </el-table-column>
+            <el-table-column align="center" prop="remark" label="备注" min-width="150" />
+            <el-table-column align="center" fixed="right" label="操作" width="180">
+              <template #default="scope">
+                <el-button
+                  v-if="isAdmin && scope.row.reservationStatus === '0'"
+                  type="warning"
+                  icon="Van"
+                  size="small"
+                  class="action-checkin-btn"
+                  @click="checkIn(scope.row.id)"
+                >
+                  转入库
+                </el-button>
+                <el-button
+                  v-if="scope.row.reservationStatus === '0'"
+                  type="danger"
+                  icon="Close"
+                  size="small"
+                  class="action-cancel-btn"
+                  @click="cancel(scope.row.id)"
+                >
+                  取消
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
 
-        <div style="margin-top: 15px">
-          <el-pagination
-            :page-size="page.pageSize"
-            background
-            :current-page="page.currentPag"
-            layout=" prev, pager, next"
-            :total="page.total"
-            @current-change="handleCurrentChange"
-          />
+          <div style="margin-top: 15px">
+            <el-pagination
+              :page-size="page.pageSize"
+              background
+              :current-page="page.currentPag"
+              layout=" prev, pager, next"
+              :total="page.total"
+              @current-change="handleCurrentChange"
+            />
+          </div>
         </div>
       </el-main>
     </el-container>
@@ -470,3 +491,29 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.action-checkin-btn {
+  color: #fff6df !important;
+  border-color: rgba(245, 187, 92, 0.72) !important;
+  background: linear-gradient(180deg, rgba(236, 166, 61, 0.96), rgba(197, 132, 36, 0.96)) !important;
+}
+
+.action-checkin-btn:hover {
+  color: #fffaf0 !important;
+  border-color: rgba(250, 205, 132, 0.88) !important;
+  background: linear-gradient(180deg, rgba(246, 183, 90, 0.98), rgba(209, 147, 49, 0.98)) !important;
+}
+
+.action-cancel-btn {
+  color: #ffe5eb !important;
+  border-color: rgba(242, 118, 146, 0.7) !important;
+  background: linear-gradient(180deg, rgba(217, 90, 122, 0.95), rgba(174, 56, 85, 0.95)) !important;
+}
+
+.action-cancel-btn:hover {
+  color: #fff3f6 !important;
+  border-color: rgba(252, 157, 178, 0.85) !important;
+  background: linear-gradient(180deg, rgba(230, 106, 136, 0.97), rgba(186, 66, 95, 0.97)) !important;
+}
+</style>

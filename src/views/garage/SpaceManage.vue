@@ -1,74 +1,111 @@
-﻿<template>
+<template>
   <div class="common-layout">
     <el-container>
       <el-header>
-        <el-row :gutter="20">
-          <el-col :span="6">
-            <el-input
-              v-model="queryParams.keyword"
-              placeholder="车位编号/区域名称"
-              clearable
-              @clear="query"
-            >
-              <template #append>
-                <el-button type="info" style="color: black" @click="query">查询</el-button>
-              </template>
-            </el-input>
-          </el-col>
-          <el-col :span="5">
-            <el-select
-              v-model="queryParams.status"
-              placeholder="车位状态"
-              clearable
-              @change="query"
-              style="width: 100%"
-            >
-              <el-option
-                v-for="item in spaceStatusOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </el-col>
-          <el-col :span="13">
-            <el-button v-if="isAdmin" type="primary" color="#337ab7" @click="addItem">
-              <el-icon><Plus /></el-icon>
-              <span>新增车位</span>
-            </el-button>
-          </el-col>
-        </el-row>
+        <div class="page-shell">
+          <div class="page-hero">
+            <div class="page-hero-title">
+              <h2>车位管理</h2>
+              <p>快速查询和维护车位，状态变化会直接影响预约和入库流程。</p>
+            </div>
+            <div class="page-hero-actions">
+              <el-button
+                v-if="isAdmin"
+                type="primary"
+                class="toolbar-strong"
+                @click="addItem"
+              >
+                <el-icon><Plus /></el-icon>
+                <span>新增车位</span>
+              </el-button>
+            </div>
+          </div>
+
+          <div class="filter-card">
+            <div class="panel-head">
+              <h3 class="panel-title">筛选条件</h3>
+              <span class="panel-hint">输入关键词后点击查询，结果会立即刷新</span>
+            </div>
+            <el-row :gutter="12" class="filter-grid">
+              <el-col :xs="24" :sm="12" :md="8" :lg="7">
+                <label class="input-label">关键词</label>
+                <el-input
+                  v-model="queryParams.keyword"
+                  placeholder="车位编号/区域名称"
+                  clearable
+                  @clear="query"
+                >
+                  <template #append>
+                    <el-button type="info" class="toolbar-subtle" @click="query">查询</el-button>
+                  </template>
+                </el-input>
+              </el-col>
+              <el-col :xs="24" :sm="12" :md="6" :lg="5">
+                <label class="input-label">车位状态</label>
+                <el-select
+                  v-model="queryParams.status"
+                  placeholder="车位状态"
+                  clearable
+                  @change="query"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="item in spaceStatusOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-col>
+            </el-row>
+            <div class="ops-note">管理员可新增、修改、删除车位；普通用户仅可查看。</div>
+          </div>
+        </div>
       </el-header>
       <el-divider style="margin: 0" />
       <el-main>
-        <el-table :data="spaceList" style="width: 100%; color: black" stripe>
-          <el-table-column align="center" type="index" :index="indexMethod" label="序号" width="60" />
-          <el-table-column align="center" prop="areaName" label="区域" width="140" />
-          <el-table-column align="center" prop="floorNo" label="楼层" width="100" />
-          <el-table-column align="center" prop="spaceNo" label="车位编号" width="130" />
-          <el-table-column align="center" prop="spaceType" label="类型" width="120">
-            <template #default="scope">{{ formatSpaceType(scope.row.spaceType) }}</template>
-          </el-table-column>
-          <el-table-column align="center" prop="status" label="状态" width="100">
-            <template #default="scope">{{ formatSpaceStatus(scope.row.status) }}</template>
-          </el-table-column>
-          <el-table-column align="center" prop="remark" label="备注" min-width="180" />
-          <el-table-column v-if="isAdmin" align="center" fixed="right" label="操作" width="180">
-            <template #default="scope">
-              <el-button type="primary" icon="Edit" link @click="edit(scope.row)">修改</el-button>
-              <el-button type="danger" icon="Delete" link @click="del(scope.row.id)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-        <div style="margin-top: 15px">
-          <el-pagination
-            :page-size="page.pageSize"
-            background
-            :current-page="page.currentPag"
-            layout=" prev, pager, next"
-            :total="page.total"
-            @current-change="handleCurrentChange"
-          />
+        <div class="table-card">
+          <div class="panel-head">
+            <h3 class="panel-title">车位列表</h3>
+            <span class="panel-hint">共 {{ page.total }} 条</span>
+          </div>
+          <el-table :data="spaceList" style="width: 100%" stripe>
+            <el-table-column align="center" type="index" :index="indexMethod" label="序号" width="60" />
+            <el-table-column align="center" prop="areaName" label="区域" width="140" />
+            <el-table-column align="center" prop="floorNo" label="楼层" width="100" />
+            <el-table-column align="center" prop="spaceNo" label="车位编号" width="130" />
+            <el-table-column align="center" prop="spaceType" label="类型" width="120">
+              <template #default="scope">{{ formatSpaceType(scope.row.spaceType) }}</template>
+            </el-table-column>
+            <el-table-column align="center" prop="status" label="状态" width="100">
+              <template #default="scope">{{ formatSpaceStatus(scope.row.status) }}</template>
+            </el-table-column>
+            <el-table-column align="center" prop="remark" label="备注" min-width="180" />
+            <el-table-column v-if="isAdmin" align="center" fixed="right" label="操作" width="180">
+              <template #default="scope">
+                <el-button type="primary" icon="Edit" size="small" plain @click="edit(scope.row)">修改</el-button>
+                <el-button
+                  type="danger"
+                  icon="Delete"
+                  size="small"
+                  class="action-delete-btn"
+                  @click="del(scope.row.id)"
+                >
+                  删除
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <div style="margin-top: 15px">
+            <el-pagination
+              :page-size="page.pageSize"
+              background
+              :current-page="page.currentPag"
+              layout=" prev, pager, next"
+              :total="page.total"
+              @current-change="handleCurrentChange"
+            />
+          </div>
         </div>
       </el-main>
     </el-container>
@@ -352,3 +389,17 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.action-delete-btn {
+  color: #ffe3e9 !important;
+  border-color: rgba(242, 118, 146, 0.68) !important;
+  background: linear-gradient(180deg, rgba(216, 85, 118, 0.95), rgba(174, 55, 84, 0.95)) !important;
+}
+
+.action-delete-btn:hover {
+  color: #fff4f7 !important;
+  border-color: rgba(252, 150, 173, 0.82) !important;
+  background: linear-gradient(180deg, rgba(231, 103, 134, 0.96), rgba(188, 62, 93, 0.96)) !important;
+}
+</style>

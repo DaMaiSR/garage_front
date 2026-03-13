@@ -2,75 +2,99 @@
   <div class="common-layout">
     <el-container>
       <el-header>
-        <el-row :gutter="20">
-          <el-col :span="6">
-            <el-input
-              v-model="queryParams.keyword"
-              placeholder="驾驶员姓名/驾驶证号"
-              clearable
-              @clear="query"
-            >
-              <template #append>
-                <el-button type="info" @click="query" style="color: black">查询</el-button>
-              </template>
-            </el-input>
-          </el-col>
-          <el-col :span="5">
-            <el-select
-              v-model="queryParams.status"
-              placeholder="状态"
-              clearable
-              @change="query"
-              style="width: 100%"
-            >
-              <el-option
-                v-for="item in statusOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </el-col>
-          <el-col :span="13">
-            <el-button type="primary" color="#337ab7" @click="addItem">
-              <el-icon><Plus /></el-icon>
-              <span>新增档案</span>
-            </el-button>
-          </el-col>
-        </el-row>
+        <div class="page-shell">
+          <div class="page-hero">
+            <div class="page-hero-title">
+              <h2>驾驶档案管理</h2>
+              <p>维护驾驶员核心资质信息，系统会在预约和入库前自动校验有效档案。</p>
+            </div>
+            <div class="page-hero-actions">
+              <el-button type="primary" class="toolbar-strong" @click="addItem">
+                <el-icon><Plus /></el-icon>
+                <span>新增档案</span>
+              </el-button>
+            </div>
+          </div>
+
+          <div class="filter-card">
+            <div class="panel-head">
+              <h3 class="panel-title">筛选条件</h3>
+              <span class="panel-hint">按姓名、证件号或状态快速定位档案</span>
+            </div>
+            <el-row :gutter="12" class="filter-grid">
+              <el-col :xs="24" :sm="12" :md="8" :lg="7">
+                <label class="input-label">关键词</label>
+                <el-input
+                  v-model="queryParams.keyword"
+                  placeholder="驾驶员姓名/驾驶证号"
+                  clearable
+                  @clear="query"
+                >
+                  <template #append>
+                    <el-button type="info" class="toolbar-subtle" @click="query">查询</el-button>
+                  </template>
+                </el-input>
+              </el-col>
+              <el-col :xs="24" :sm="12" :md="6" :lg="5">
+                <label class="input-label">状态</label>
+                <el-select
+                  v-model="queryParams.status"
+                  placeholder="状态"
+                  clearable
+                  @change="query"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="item in statusOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-col>
+            </el-row>
+            <div class="ops-note">建议仅保留一个有效档案，避免车辆预约时产生冲突。</div>
+          </div>
+        </div>
       </el-header>
 
       <el-divider style="margin: 0" />
 
       <el-main>
-        <el-table :data="profileList" style="width: 100%; color: black" stripe>
-          <el-table-column align="center" type="index" :index="indexMethod" label="序号" width="60" />
-          <el-table-column align="center" prop="driverName" label="驾驶员姓名" width="130" />
-          <el-table-column align="center" prop="licenseNo" label="驾驶证号" width="160" />
-          <el-table-column align="center" prop="licenseType" label="准驾车型" width="120" />
-          <el-table-column align="center" prop="validUntil" label="有效期至" width="140" />
-          <el-table-column align="center" prop="phone" label="手机号" width="130" />
-          <el-table-column align="center" prop="status" label="状态" width="100">
-            <template #default="scope">{{ formatStatus(scope.row.status) }}</template>
-          </el-table-column>
-          <el-table-column align="center" prop="remark" label="备注" min-width="180" />
-          <el-table-column align="center" fixed="right" label="操作" width="180">
-            <template #default="scope">
-              <el-button type="primary" icon="Edit" link @click="edit(scope.row)">修改</el-button>
-              <el-button type="danger" icon="Delete" link @click="del(scope.row.id)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+        <div class="table-card">
+          <div class="panel-head">
+            <h3 class="panel-title">驾驶档案列表</h3>
+            <span class="panel-hint">共 {{ page.total }} 条</span>
+          </div>
+          <el-table :data="profileList" style="width: 100%" stripe>
+            <el-table-column align="center" type="index" :index="indexMethod" label="序号" width="60" />
+            <el-table-column align="center" prop="driverName" label="驾驶员姓名" width="130" />
+            <el-table-column align="center" prop="licenseNo" label="驾驶证号" width="160" />
+            <el-table-column align="center" prop="licenseType" label="准驾车型" width="120" />
+            <el-table-column align="center" prop="validUntil" label="有效期至" width="140" />
+            <el-table-column align="center" prop="phone" label="手机号" width="130" />
+            <el-table-column align="center" prop="status" label="状态" width="100">
+              <template #default="scope">{{ formatStatus(scope.row.status) }}</template>
+            </el-table-column>
+            <el-table-column align="center" prop="remark" label="备注" min-width="180" />
+            <el-table-column align="center" fixed="right" label="操作" width="180">
+              <template #default="scope">
+                <el-button type="primary" icon="Edit" link @click="edit(scope.row)">修改</el-button>
+                <el-button type="danger" icon="Delete" link @click="del(scope.row.id)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
 
-        <div style="margin-top: 15px">
-          <el-pagination
-            :page-size="page.pageSize"
-            background
-            :current-page="page.currentPag"
-            layout=" prev, pager, next"
-            :total="page.total"
-            @current-change="handleCurrentChange"
-          />
+          <div style="margin-top: 15px">
+            <el-pagination
+              :page-size="page.pageSize"
+              background
+              :current-page="page.currentPag"
+              layout=" prev, pager, next"
+              :total="page.total"
+              @current-change="handleCurrentChange"
+            />
+          </div>
         </div>
       </el-main>
     </el-container>

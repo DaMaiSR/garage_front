@@ -2,80 +2,104 @@
   <div class="common-layout">
     <el-container>
       <el-header>
-        <el-row :gutter="20">
-          <el-col :span="6">
-            <el-input
-              v-model="queryParams.keyword"
-              placeholder="车牌号/车主"
-              clearable
-              @clear="query"
-            >
-              <template #append>
-                <el-button type="info" @click="query" style="color: black">查询</el-button>
-              </template>
-            </el-input>
-          </el-col>
-          <el-col :span="5">
-            <el-select
-              v-model="queryParams.status"
-              placeholder="状态"
-              clearable
-              style="width: 100%"
-              @change="query"
-            >
-              <el-option
-                v-for="item in statusOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </el-col>
-          <el-col :span="13">
-            <el-button type="primary" color="#337ab7" @click="addItem">
-              <el-icon><Plus /></el-icon>
-              <span>新增车辆</span>
-            </el-button>
-          </el-col>
-        </el-row>
+        <div class="page-shell">
+          <div class="page-hero">
+            <div class="page-hero-title">
+              <h2>车辆管理</h2>
+              <p>统一维护车辆资料，支持快速增删改与状态筛选，方便日常运营。</p>
+            </div>
+            <div class="page-hero-actions">
+              <el-button type="primary" class="toolbar-strong" @click="addItem">
+                <el-icon><Plus /></el-icon>
+                <span>新增车辆</span>
+              </el-button>
+            </div>
+          </div>
+
+          <div class="filter-card">
+            <div class="panel-head">
+              <h3 class="panel-title">筛选条件</h3>
+              <span class="panel-hint">先筛选再操作，提升定位效率</span>
+            </div>
+            <el-row :gutter="12" class="filter-grid">
+              <el-col :xs="24" :sm="12" :md="8" :lg="7">
+                <label class="input-label">关键词</label>
+                <el-input
+                  v-model="queryParams.keyword"
+                  placeholder="车牌号/车主"
+                  clearable
+                  @clear="query"
+                >
+                  <template #append>
+                    <el-button type="info" class="toolbar-subtle" @click="query">查询</el-button>
+                  </template>
+                </el-input>
+              </el-col>
+              <el-col :xs="24" :sm="12" :md="6" :lg="5">
+                <label class="input-label">状态</label>
+                <el-select
+                  v-model="queryParams.status"
+                  placeholder="状态"
+                  clearable
+                  style="width: 100%"
+                  @change="query"
+                >
+                  <el-option
+                    v-for="item in statusOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-col>
+            </el-row>
+            <div class="ops-note">车辆信息是预约与停车记录的主数据，请保持车牌和手机号准确。</div>
+          </div>
+        </div>
       </el-header>
 
       <el-divider style="margin: 0" />
 
       <el-main>
-        <el-table :data="vehicleList" style="width: 100%; color: black" stripe>
-          <el-table-column align="center" type="index" :index="indexMethod" label="序号" width="60" />
-          <el-table-column align="center" prop="plateNo" label="车牌号" width="130" />
-          <el-table-column align="center" prop="ownerName" label="车主" width="110" />
-          <el-table-column align="center" prop="ownerPhone" label="联系电话" width="140" />
-          <el-table-column align="center" prop="vehicleType" label="车辆类型" width="120">
-            <template #default="scope">{{ formatVehicleType(scope.row.vehicleType) }}</template>
-          </el-table-column>
-          <el-table-column align="center" prop="memberType" label="会员类型" width="120">
-            <template #default="scope">{{ formatMemberType(scope.row.memberType) }}</template>
-          </el-table-column>
-          <el-table-column align="center" prop="bindSpaceNo" label="绑定车位" width="120" />
-          <el-table-column align="center" prop="expireDate" label="有效期至" width="140" />
-          <el-table-column align="center" prop="status" label="状态" width="100">
-            <template #default="scope">{{ formatStatus(scope.row.status) }}</template>
-          </el-table-column>
-          <el-table-column align="center" fixed="right" label="操作" width="180">
-            <template #default="scope">
-              <el-button type="primary" icon="Edit" link @click="edit(scope.row)">修改</el-button>
-              <el-button type="danger" icon="Delete" link @click="del(scope.row.id)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+        <div class="table-card">
+          <div class="panel-head">
+            <h3 class="panel-title">车辆列表</h3>
+            <span class="panel-hint">共 {{ page.total }} 条</span>
+          </div>
+          <el-table :data="vehicleList" style="width: 100%" stripe>
+            <el-table-column align="center" type="index" :index="indexMethod" label="序号" width="60" />
+            <el-table-column align="center" prop="plateNo" label="车牌号" width="130" />
+            <el-table-column align="center" prop="ownerName" label="车主" width="110" />
+            <el-table-column align="center" prop="ownerPhone" label="联系电话" width="140" />
+            <el-table-column align="center" prop="vehicleType" label="车辆类型" width="120">
+              <template #default="scope">{{ formatVehicleType(scope.row.vehicleType) }}</template>
+            </el-table-column>
+            <el-table-column align="center" prop="memberType" label="会员类型" width="120">
+              <template #default="scope">{{ formatMemberType(scope.row.memberType) }}</template>
+            </el-table-column>
+            <el-table-column align="center" prop="bindSpaceNo" label="绑定车位" width="120" />
+            <el-table-column align="center" prop="expireDate" label="有效期至" width="140" />
+            <el-table-column align="center" prop="status" label="状态" width="100">
+              <template #default="scope">{{ formatStatus(scope.row.status) }}</template>
+            </el-table-column>
+            <el-table-column align="center" fixed="right" label="操作" width="180">
+              <template #default="scope">
+                <el-button type="primary" icon="Edit" link @click="edit(scope.row)">修改</el-button>
+                <el-button type="danger" icon="Delete" link @click="del(scope.row.id)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
 
-        <div style="margin-top: 15px">
-          <el-pagination
-            :page-size="page.pageSize"
-            background
-            :current-page="page.currentPag"
-            layout=" prev, pager, next"
-            :total="page.total"
-            @current-change="handleCurrentChange"
-          />
+          <div style="margin-top: 15px">
+            <el-pagination
+              :page-size="page.pageSize"
+              background
+              :current-page="page.currentPag"
+              layout=" prev, pager, next"
+              :total="page.total"
+              @current-change="handleCurrentChange"
+            />
+          </div>
         </div>
       </el-main>
     </el-container>

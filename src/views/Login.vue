@@ -196,29 +196,36 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1f6eb3, #4ba3df);
+  padding: 20px;
+  background:
+    radial-gradient(circle at 14% 14%, rgba(66, 124, 255, 0.22), transparent 40%),
+    radial-gradient(circle at 88% 2%, rgba(73, 176, 255, 0.18), transparent 40%),
+    linear-gradient(180deg, #08102d 0%, #060b1c 100%);
 }
 
 .login-card {
   width: 420px;
-  background-color: #fff;
-  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(18, 33, 82, 0.96), rgba(11, 21, 54, 0.96));
+  border-radius: 14px;
+  border: 1px solid rgba(89, 141, 255, 0.32);
   padding: 28px;
-  box-shadow: 0 16px 32px rgba(17, 61, 107, 0.2);
+  box-shadow: 0 24px 42px rgba(2, 8, 25, 0.42);
 }
 
 .title {
   margin-bottom: 20px;
-  color: #20518d;
+  color: #deebff;
+  letter-spacing: 0.8px;
 }
 
 .full {
   width: 100%;
+  margin-top: 6px;
 }
 
 .tips {
   margin-top: 14px;
-  color: #666;
+  color: #8ea7d8;
   font-size: 12px;
 }
 
@@ -228,6 +235,10 @@ export default {
   align-items: center;
   gap: 8px;
   justify-content: flex-end;
-  color: #555;
+  color: #9eb8e8;
+}
+
+.login-bg :deep(.el-form-item__label) {
+  color: #a8c2ee;
 }
 </style>
