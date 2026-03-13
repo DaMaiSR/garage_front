@@ -315,21 +315,7 @@ export default {
       return Array.from(set).map((item) => ({ value: item, label: item }));
     },
     filteredActiveRecords() {
-      return this.activeRecords.filter((row) => {
-        if (!row) {
-          return false;
-        }
-        if (this.appliedFilters.plateNo && row.plateNo !== this.appliedFilters.plateNo) {
-          return false;
-        }
-        if (this.appliedFilters.spaceNo && row.spaceNo !== this.appliedFilters.spaceNo) {
-          return false;
-        }
-        if (this.appliedFilters.recordStatus && String(row.recordStatus) !== this.appliedFilters.recordStatus) {
-          return false;
-        }
-        return true;
-      });
+      return this.activeRecords.filter((row) => !!row);
     },
     filteredSpaceRows() {
       return this.spaceRows.filter((row) => {
@@ -356,7 +342,7 @@ export default {
     },
     activeRecordMapBySpaceNo() {
       const map = {};
-      this.filteredActiveRecords.forEach((row) => {
+      this.activeRecords.forEach((row) => {
         if (row && row.spaceNo) {
           map[row.spaceNo] = row;
         }
@@ -378,7 +364,7 @@ export default {
       return this.getPageSlice(this.detailRows, this.detailPage, this.detailPageSize);
     },
     filteredFreeSpaceRows() {
-      return this.filteredSpaceRows.filter((item) => String(item.status) === "0");
+      return this.spaceRows.filter((item) => item && String(item.status) === "0");
     },
     activeListRows() {
       return this.getPageSlice(this.filteredActiveRecords, this.activePage, this.activePageSize);
@@ -506,8 +492,6 @@ export default {
       return list.slice(start, start + size);
     },
     resetPagerPages() {
-      this.activePage = 1;
-      this.freePage = 1;
       this.detailPage = 1;
     },
     handleActivePageChange(page) {
