@@ -77,10 +77,22 @@
               <template #default="scope">{{ formatStatus(scope.row.status) }}</template>
             </el-table-column>
             <el-table-column align="center" prop="remark" label="备注" min-width="180" />
-            <el-table-column align="center" fixed="right" label="操作" width="180">
+            <el-table-column align="center" fixed="right" label="操作" width="190">
               <template #default="scope">
-                <el-button type="primary" icon="Edit" link @click="edit(scope.row)">修改</el-button>
-                <el-button type="danger" icon="Delete" link @click="del(scope.row.id)">删除</el-button>
+                <div class="table-op-row">
+                  <el-button type="primary" icon="Edit" size="small" class="table-op-btn" @click="edit(scope.row)">
+                    修改
+                  </el-button>
+                  <el-button
+                    type="danger"
+                    icon="Delete"
+                    size="small"
+                    class="table-op-btn table-op-btn--danger"
+                    @click="del(scope.row.id)"
+                  >
+                    删除
+                  </el-button>
+                </div>
               </template>
             </el-table-column>
           </el-table>

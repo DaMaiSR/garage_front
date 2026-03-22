@@ -221,6 +221,8 @@ export default {
 .full {
   width: 100%;
   margin-top: 6px;
+  height: 40px;
+  font-size: 15px;
 }
 
 .tips {
@@ -240,5 +242,27 @@ export default {
 
 .login-bg :deep(.el-form-item__label) {
   color: #a8c2ee;
+  font-weight: 600;
+}
+
+.login-card :deep(.el-input__wrapper) {
+  background: rgba(4, 9, 27, 0.96) !important;
+  box-shadow: 0 0 0 1px rgba(104, 154, 255, 0.62) inset !important;
+}
+
+.login-card :deep(.el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 1px rgba(143, 194, 255, 0.9) inset, 0 0 0 3px rgba(85, 143, 246, 0.18) !important;
+}
+
+.login-card :deep(.el-input__inner) {
+  color: #f6faff !important;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.login-card :deep(.el-input__inner::placeholder) {
+  color: rgba(180, 206, 247, 0.76) !important;
+  font-weight: 500;
 }
 </style>

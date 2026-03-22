@@ -86,28 +86,31 @@
               <template #default="scope">{{ formatReservationStatus(scope.row.reservationStatus) }}</template>
             </el-table-column>
             <el-table-column align="center" prop="remark" label="备注" min-width="150" />
-            <el-table-column align="center" fixed="right" label="操作" width="180">
+            <el-table-column align="center" fixed="right" label="操作" width="198">
               <template #default="scope">
-                <el-button
-                  v-if="isAdmin && scope.row.reservationStatus === '0'"
-                  type="warning"
-                  icon="Van"
-                  size="small"
-                  class="action-checkin-btn"
-                  @click="checkIn(scope.row.id)"
-                >
-                  转入库
-                </el-button>
-                <el-button
-                  v-if="scope.row.reservationStatus === '0'"
-                  type="danger"
-                  icon="Close"
-                  size="small"
-                  class="action-cancel-btn"
-                  @click="cancel(scope.row.id)"
-                >
-                  取消
-                </el-button>
+                <div class="table-op-row">
+                  <el-button
+                    v-if="isAdmin && scope.row.reservationStatus === '0'"
+                    type="warning"
+                    icon="Van"
+                    size="small"
+                    class="table-op-btn action-checkin-btn"
+                    @click="checkIn(scope.row.id)"
+                  >
+                    转入库
+                  </el-button>
+                  <el-button
+                    v-if="scope.row.reservationStatus === '0'"
+                    type="danger"
+                    icon="Close"
+                    size="small"
+                    class="table-op-btn table-op-btn--danger action-cancel-btn"
+                    @click="cancel(scope.row.id)"
+                  >
+                    取消
+                  </el-button>
+                  <span v-if="scope.row.reservationStatus !== '0'" class="table-op-empty">--</span>
+                </div>
               </template>
             </el-table-column>
           </el-table>
@@ -517,3 +520,4 @@ export default {
   background: linear-gradient(180deg, rgba(230, 106, 136, 0.97), rgba(186, 66, 95, 0.97)) !important;
 }
 </style>
+

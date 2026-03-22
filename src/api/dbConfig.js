@@ -29,6 +29,11 @@ export const adminMenus = [
         title: "实时监控",
         path: "/garage/realtimeMonitor",
         icon: "Monitor"
+      },
+      {
+        title: "车牌识别",
+        path: "/garage/plateRecognition",
+        icon: "Camera"
       }
     ]
   },

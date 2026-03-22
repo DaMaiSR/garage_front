@@ -81,18 +81,22 @@
               <template #default="scope">{{ formatSpaceStatus(scope.row.status) }}</template>
             </el-table-column>
             <el-table-column align="center" prop="remark" label="备注" min-width="180" />
-            <el-table-column v-if="isAdmin" align="center" fixed="right" label="操作" width="180">
+            <el-table-column v-if="isAdmin" align="center" fixed="right" label="操作" width="190">
               <template #default="scope">
-                <el-button type="primary" icon="Edit" size="small" plain @click="edit(scope.row)">修改</el-button>
-                <el-button
-                  type="danger"
-                  icon="Delete"
-                  size="small"
-                  class="action-delete-btn"
-                  @click="del(scope.row.id)"
-                >
-                  删除
-                </el-button>
+                <div class="table-op-row">
+                  <el-button type="primary" icon="Edit" size="small" class="table-op-btn" @click="edit(scope.row)">
+                    修改
+                  </el-button>
+                  <el-button
+                    type="danger"
+                    icon="Delete"
+                    size="small"
+                    class="table-op-btn table-op-btn--danger action-delete-btn"
+                    @click="del(scope.row.id)"
+                  >
+                    删除
+                  </el-button>
+                </div>
               </template>
             </el-table-column>
           </el-table>
@@ -390,16 +394,3 @@ export default {
 };
 </script>
 
-<style scoped>
-.action-delete-btn {
-  color: #ffe3e9 !important;
-  border-color: rgba(242, 118, 146, 0.68) !important;
-  background: linear-gradient(180deg, rgba(216, 85, 118, 0.95), rgba(174, 55, 84, 0.95)) !important;
-}
-
-.action-delete-btn:hover {
-  color: #fff4f7 !important;
-  border-color: rgba(252, 150, 173, 0.82) !important;
-  background: linear-gradient(180deg, rgba(231, 103, 134, 0.96), rgba(188, 62, 93, 0.96)) !important;
-}
-</style>

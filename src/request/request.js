@@ -45,7 +45,8 @@ instance.interceptors.request.use(
     if (token) {
       config.headers.token = token;
     }
-    if (config.method === "post") {
+    const isFormData = typeof FormData !== "undefined" && config.data instanceof FormData;
+    if (config.method === "post" && !isFormData) {
       config.data = qs.stringify(config.data);
     }
     return config;

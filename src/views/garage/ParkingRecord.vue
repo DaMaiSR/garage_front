@@ -80,17 +80,21 @@
             <el-table-column align="center" prop="recordStatus" label="在场状态" width="100">
               <template #default="scope">{{ formatRecordStatus(scope.row.recordStatus) }}</template>
             </el-table-column>
-            <el-table-column align="center" fixed="right" label="操作" width="150">
+            <el-table-column align="center" fixed="right" label="操作" width="172">
               <template #default="scope">
-                <el-button
-                  type="warning"
-                  icon="Switch"
-                  link
-                  v-if="isCanOut(scope.row)"
-                  @click="openOutDialog(scope.row)"
-                >
-                  出库结算
-                </el-button>
+                <div class="table-op-row">
+                  <el-button
+                    type="warning"
+                    icon="Switch"
+                    size="small"
+                    class="table-op-btn"
+                    v-if="isCanOut(scope.row)"
+                    @click="openOutDialog(scope.row)"
+                  >
+                    出库结算
+                  </el-button>
+                  <span v-else class="table-op-empty">--</span>
+                </div>
               </template>
             </el-table-column>
           </el-table>

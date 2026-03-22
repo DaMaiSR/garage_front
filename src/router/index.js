@@ -64,6 +64,12 @@ const routes = [
         name: "realtimeMonitor",
         meta: { roles: [ROLE_ADMIN] },
         component: () => import("@/views/garage/RealtimeMonitor.vue")
+      },
+      {
+        path: "/garage/plateRecognition",
+        name: "plateRecognition",
+        meta: { roles: [ROLE_ADMIN] },
+        component: () => import("@/views/garage/PlateRecognition.vue")
       }
     ]
   },
