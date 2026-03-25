@@ -6,7 +6,7 @@
           <div class="page-hero">
             <div class="page-hero-title">
               <h2>停车记录</h2>
-              <p>统一处理车辆入库与出库结算，费用按停车时长自动计算。</p>
+              <p>统一处理车辆入库与出库支付，用户完成支付后在出口扫码完成放行。</p>
             </div>
             <div class="page-hero-actions">
               <el-button type="primary" class="toolbar-strong" @click="openInDialog">
@@ -53,7 +53,7 @@
                 </el-select>
               </el-col>
             </el-row>
-            <div class="ops-note">出库结算时系统会自动计算费用，并需选择支付方式完成支付后出库。</div>
+            <div class="ops-note">用户需先完成出库支付，随后在出口进行车牌扫描，系统校验已支付后放行出库。</div>
           </div>
         </div>
       </el-header>
@@ -88,11 +88,12 @@
                     icon="Switch"
                     size="small"
                     class="table-op-btn"
-                    v-if="isCanOut(scope.row)"
+                    v-if="isCanPay(scope.row)"
                     @click="openOutDialog(scope.row)"
                   >
-                    出库结算
+                    出库支付
                   </el-button>
+                  <span v-else-if="isAwaitScan(scope.row)" class="table-op-empty">已支付待扫码</span>
                   <span v-else class="table-op-empty">--</span>
                 </div>
               </template>
@@ -140,8 +141,14 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="车位编号" prop="spaceNo">
-          <el-select v-model="inDialog.form.spaceNo" filterable placeholder="请选择车位" style="width: 360px">
+        <el-form-item label="车位编号（可选）">
+          <el-select
+            v-model="inDialog.form.spaceNo"
+            filterable
+            clearable
+            placeholder="可留空，系统自动分配"
+            style="width: 360px"
+          >
             <el-option
               v-for="item in spaceOptions"
               :key="item.id"
@@ -175,7 +182,7 @@
 
     <el-dialog
       v-model="outDialog.dialogVisible"
-      title="出库结算"
+      title="出库支付（支付后扫码出库）"
       width="40%"
       align-center
       draggable
@@ -199,14 +206,14 @@
         <el-form-item label="入场时间">
           <el-input v-model="outDialog.form.inTime" readonly />
         </el-form-item>
-        <el-form-item label="出场时间" prop="outTime">
+        <el-form-item label="支付时间" prop="outTime">
           <el-date-picker
             style="width: 360px"
             v-model="outDialog.form.outTime"
             type="datetime"
             format="YYYY/MM/DD HH:mm:ss"
             value-format="YYYY-MM-DD HH:mm:ss"
-            placeholder="请选择出场时间"
+            placeholder="请选择支付时间"
             @change="onOutTimeChange"
           />
         </el-form-item>
@@ -230,7 +237,7 @@
       <el-divider border-style="double" style="margin: 0" />
       <template #footer>
         <span class="dialog-footer" style="padding-top: 0px">
-          <el-button type="primary" :loading="outDialog.submitting" @click="saveOut('outForm')">保存</el-button>
+          <el-button type="primary" :loading="outDialog.submitting" @click="saveOut('outForm')">确认支付</el-button>
           <el-button @click="closeOutDialog">取消</el-button>
         </span>
       </template>
@@ -243,7 +250,7 @@ import { getNowDateTime } from "@/utils/common.js";
 import {
   listGarageRecordPage,
   addGarageInRecord,
-  updateGarageOutRecord
+  payGarageOutRecord
 } from "@/api/garageRecordApi.js";
 import { listGarageVehicle } from "@/api/garageVehicleApi.js";
 import { listGarageSpacePage } from "@/api/garageSpaceApi.js";
@@ -312,7 +319,6 @@ export default {
       },
       inRules: {
         vehicleId: [{ required: true, message: "请选择车辆", trigger: "change" }],
-        spaceNo: [{ required: true, message: "请选择车位", trigger: "change" }],
         inTime: [{ required: true, message: "请选择入场时间", trigger: "change" }]
       },
       outRules: {
@@ -333,8 +339,11 @@ export default {
       const item = this.recordStatusOptions.find((temp) => temp.value === String(value));
       return item ? item.label : value;
     },
-    isCanOut(row) {
-      return row && String(row.recordStatus) === "0";
+    isCanPay(row) {
+      return row && String(row.recordStatus) === "0" && String(row.payStatus) !== "1";
+    },
+    isAwaitScan(row) {
+      return row && String(row.recordStatus) === "0" && String(row.payStatus) === "1";
     },
     query() {
       this.queryParams.pageSize = "1";
@@ -403,11 +412,6 @@ export default {
         });
         return;
       }
-      if (this.spaceOptions.length === 0) {
-        this.$message.warning("当前没有可用空闲车位，请稍后再试");
-        return;
-      }
-
       this.inDialog.dialogVisible = true;
       this.$nextTick(() => {
         this.initInForm();
@@ -480,12 +484,15 @@ export default {
 
       try {
         this.inDialog.submitting = true;
+        const selectedSpaceNo = (this.inDialog.form.spaceNo || "").trim();
         const payload = {
           plateNo: selectedVehicle.plateNo,
-          spaceNo: this.inDialog.form.spaceNo,
           inTime: this.inDialog.form.inTime,
           remark: (this.inDialog.form.remark || "").trim()
         };
+        if (selectedSpaceNo) {
+          payload.spaceNo = selectedSpaceNo;
+        }
         const res = await addGarageInRecord(payload);
         if (res && res.flag) {
           this.$message.success(res.message || "入库成功");
@@ -524,22 +531,19 @@ export default {
         this.outDialog.submitting = true;
         const payload = {
           id: this.outDialog.form.id,
-          plateNo: this.outDialog.form.plateNo,
-          spaceNo: this.outDialog.form.spaceNo,
           outTime: this.outDialog.form.outTime,
-          totalFee: String(this.outDialog.form.totalFee).trim(),
           payMethod: this.outDialog.form.payMethod
         };
-        const res = await updateGarageOutRecord(payload);
+        const res = await payGarageOutRecord(payload);
         if (res && res.flag) {
-          this.$message.success(res.message || "出库成功");
+          this.$message.success(res.message || "支付成功，请扫码出库");
           this.closeOutDialog();
           this.getRecordList();
           return;
         }
-        this.$message.error((res && res.message) || "出库失败");
+        this.$message.error((res && res.message) || "支付失败");
       } catch (error) {
-        this.$message.error(error.userMessage || "出库失败，请稍后重试");
+        this.$message.error(error.userMessage || "支付失败，请稍后重试");
       } finally {
         this.outDialog.submitting = false;
       }

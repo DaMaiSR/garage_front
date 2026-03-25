@@ -8,6 +8,10 @@ function addGarageInRecord(data) {
   return http.post("/garageRecord/addGarageInRecord", data);
 }
 
+function payGarageOutRecord(data) {
+  return http.post("/garageRecord/payGarageOutRecord", data);
+}
+
 function updateGarageOutRecord(data) {
   return http.post("/garageRecord/updateGarageOutRecord", data);
 }
@@ -15,5 +19,6 @@ function updateGarageOutRecord(data) {
 export {
   listGarageRecordPage,
   addGarageInRecord,
+  payGarageOutRecord,
   updateGarageOutRecord
 };

@@ -6,7 +6,7 @@
           <div class="page-hero">
             <div class="page-hero-title">
               <h2>车牌识别自动入出库</h2>
-              <p>上传本地图片后，系统将通过 YOLO+LPRNet 识别车牌并自动执行入库/出库流程。</p>
+              <p>上传本地图片后，系统将通过 YOLO+LPRNet 识别车牌并执行入库/出库流程（出库需先完成支付）。</p>
             </div>
           </div>
         </div>
@@ -41,6 +41,7 @@
                 </el-col>
               </el-row>
             </el-form>
+            <div v-if="form.action === 'OUT'" class="ops-note">未支付车辆会被拦截，请先在“停车记录”页面完成支付。</div>
 
             <el-upload
               class="upload-zone"
@@ -64,7 +65,7 @@
 
             <div class="action-row">
               <el-button type="primary" class="toolbar-strong" :loading="submitting" @click="submitRecognition">
-                识别并自动执行
+                识别并执行流程
               </el-button>
               <el-button class="toolbar-subtle" @click="resetForm">重置</el-button>
             </div>
