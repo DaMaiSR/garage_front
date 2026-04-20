@@ -1,6 +1,6 @@
 import { createStore } from "vuex";
 import { getSessionStorage, setSessionStorage } from "@/utils/common.js";
-import { getMenusByRole, ROLE_USER } from "@/api/dbConfig.js";
+import { ensureFeeRuleMenu, getMenusByRole, ROLE_USER } from "@/api/dbConfig.js";
 
 function isChineseMenuList(menuList) {
   if (!Array.isArray(menuList) || menuList.length === 0) {
@@ -23,11 +23,12 @@ function isChineseMenuList(menuList) {
 
 function resolveInitialMenus() {
   const cachedMenus = getSessionStorage("menuList");
-  if (isChineseMenuList(cachedMenus)) {
-    return cachedMenus;
-  }
   const user = getSessionStorage("user");
-  return getMenusByRole((user && user.role) || ROLE_USER);
+  const role = (user && user.role) || ROLE_USER;
+  if (isChineseMenuList(cachedMenus)) {
+    return ensureFeeRuleMenu(cachedMenus, role);
+  }
+  return ensureFeeRuleMenu(getMenusByRole(role), role);
 }
 
 function getFirstPathFromMenus(menus) {
@@ -76,7 +77,9 @@ export default createStore({
   },
   mutations: {
     addMenus(state, menuList) {
-      state.menus = Array.isArray(menuList) ? menuList : [];
+      const user = getSessionStorage("user");
+      const role = (user && user.role) || ROLE_USER;
+      state.menus = ensureFeeRuleMenu(Array.isArray(menuList) ? menuList : [], role);
       setSessionStorage("menuList", state.menus);
     },
     clearMenus(state) {

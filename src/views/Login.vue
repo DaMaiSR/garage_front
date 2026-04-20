@@ -64,7 +64,7 @@
 <script>
 import { login, register } from "@/api/userApi.js";
 import { setSessionStorage } from "@/utils/common.js";
-import { getMenusByRole, ROLE_USER } from "@/api/dbConfig.js";
+import { ensureFeeRuleMenu, getMenusByRole, ROLE_USER } from "@/api/dbConfig.js";
 
 export default {
   data() {
@@ -125,11 +125,11 @@ export default {
               role: ROLE_USER
             };
           const menuList =
-            (Array.isArray(payload.menuList) && payload.menuList.length > 0
+            ensureFeeRuleMenu((Array.isArray(payload.menuList) && payload.menuList.length > 0
               ? payload.menuList
               : Array.isArray(user.menuList) && user.menuList.length > 0
                 ? user.menuList
-                : getMenusByRole(user.role));
+                : getMenusByRole(user.role)), user.role);
 
           sessionStorage.setItem("token", token);
           setSessionStorage("user", user);

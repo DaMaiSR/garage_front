@@ -34,6 +34,11 @@ export const adminMenus = [
         title: "车牌识别",
         path: "/garage/plateRecognition",
         icon: "Camera"
+      },
+      {
+        title: "费用规则",
+        path: "/garage/feeRuleManage",
+        icon: "Coin"
       }
     ]
   },
@@ -113,6 +118,38 @@ export function getMenusByRole(role) {
     return JSON.parse(JSON.stringify(userMenus));
   }
   return JSON.parse(JSON.stringify(adminMenus));
+}
+
+export function ensureFeeRuleMenu(menuList, role) {
+  const safeMenus = Array.isArray(menuList) ? JSON.parse(JSON.stringify(menuList)) : [];
+  if (role !== ROLE_ADMIN) {
+    return safeMenus;
+  }
+
+  let garageMenu = safeMenus.find((item) => item && item.title === "车库管理");
+  if (!garageMenu) {
+    garageMenu = {
+      menusIndex: "1",
+      title: "车库管理",
+      icon: "Van",
+      children: []
+    };
+    safeMenus.unshift(garageMenu);
+  }
+
+  if (!Array.isArray(garageMenu.children)) {
+    garageMenu.children = [];
+  }
+
+  const existed = garageMenu.children.some((child) => child && child.path === "/garage/feeRuleManage");
+  if (!existed) {
+    garageMenu.children.push({
+      title: "费用规则",
+      path: "/garage/feeRuleManage",
+      icon: "Coin"
+    });
+  }
+  return safeMenus;
 }
 
 export function padNumber(value) {

@@ -70,6 +70,12 @@ const routes = [
         name: "plateRecognition",
         meta: { roles: [ROLE_ADMIN] },
         component: () => import("@/views/garage/PlateRecognition.vue")
+      },
+      {
+        path: "/garage/feeRuleManage",
+        name: "feeRuleManage",
+        meta: { roles: [ROLE_ADMIN] },
+        component: () => import("@/views/garage/FeeRuleManage.vue")
       }
     ]
   },
